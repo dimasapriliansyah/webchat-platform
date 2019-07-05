@@ -8,7 +8,7 @@ const whitelist = async(req, res, next) => {
     console.log("referer: ", referer);
     console.log("remoteAddress: ", remoteAddress);
 
-    if (remoteAddress = '127.0.0.1' && !referer) {
+    if (remoteAddress == "127.0.0.1" && !referer) {
         let info = { alias: "oct_dev", secret_key: "oct_dev" };
         req.htmlFilename = info;
         return next();
@@ -32,7 +32,8 @@ const whitelist = async(req, res, next) => {
             }
         })
         .catch(error => {
-            next(error);
+            const err = error.sqlMessage;
+            next(err);
         });
 };
 
