@@ -1,51 +1,103 @@
+// Dependencies.
+require('dotenv').config();
 const express = require("express");
 const session = require("express-session");
 const helmet = require("helmet");
+const fs = require("fs");
+const rfs = require('rotating-file-stream');
+const path = require('path');
+const https = require("https");
+const morgan = require('morgan')
 
-// Route definitions.
-const domainFilterRoute = require("./service/livechat/routes/domainFilter");
+// Routes.
+const refererFilterRoute = require("./service/livechat/routes/RefererFilter");
+const customerRoute = require("./service/livechat/routes/Customer");
 
-// Import redis connection.
-const redisClient = require("./libs/redis/connection");
+// Redis connection.
+const redisClient = require("./connection/redis");
 
-// Setup session-store to using redis.
+// Setup http logger
+// create a rotating write stream
+const accessLogStream = rfs('access.log', {
+  interval: '1d', // rotate daily
+  path: path.join(__dirname, 'logs', 'http')
+})
+
+// Session store using redis.
 const redisStore = require("connect-redis")(session);
 
 // Setup express.
 const app = express();
 
-// Setup helmet to help secure the express app by setting various http header.
+// Setup helmet to secure app.
 app.use(
-    helmet({
-        frameguard: false
-    })
+  helmet({
+    frameguard: false
+  })
 );
 
-// Configure session and register redisStore to session.
+// Body parser to read json format.
+app.use(express.json());
+
+// Setup session.
+const sessionMiddleware = session({
+  secret: process.env.SESSION_SECRET,
+  name: process.env.SESSION_NAME,
+  resave: false,
+  saveUninitialized: false,
+  cookie: { secure: false },
+  store: new redisStore({
+    host: process.env.REDIS_HOST,
+    port: parseInt(process.env.REDIS_PORT),
+    client: redisClient,
+    ttl: 60 // How many session expires in seconds.
+  })
+})
+
+// Register Logger
+app.use(morgan('combined', { stream: accessLogStream }))
+
+// Register Session
 app.use(
-    session({
-        secret: "VC8g&at(1hc_9zx9U2a)192",
-        name: "_8sasy0hdasd7",
-        resave: false,
-        saveUninitialized: false,
-        cookie: { secure: false },
-        store: new redisStore({
-            host: "localhost",
-            port: 6379,
-            client: redisClient,
-            ttl: 60 // How many session expires in seconds.
-        })
-    })
+  sessionMiddleware
 );
 
-app.use(domainFilterRoute);
+// Register webchat plugin route.
+app.use("/plugin/webchat", refererFilterRoute);
 
-// HTTP
-const http = require("http").createServer(app);
+// Register static assets.
+app.use("plugin/client/statics", express.static('client'));
 
-// // SETUP WEBSOCKET
+// Register customer routes.
+app.use("/customers", customerRoute)
+
+// Register not found routes.
+app.use((req, res, next) => {
+  res.send("Not found")
+})
+
+// Setup https
+const privateKey = fs.readFileSync(
+  process.env.HTTPS_PRIVATE_KEY,
+  "utf8"
+);
+const certificate = fs.readFileSync(
+  process.env.HTTPS_CERT,
+  "utf8"
+);
+const bundle = fs.readFileSync(
+  process.env.HTTPS_BUNDLE,
+  "utf8"
+);
+
+const credentials = { key: privateKey, cert: certificate, ca: bundle };
+const httpsServer = https.createServer(credentials, app);
+
+// Setup websocket.
 const livechat = require("./service/livechat/sockets/index");
-livechat.listen(http);
+livechat.listen(httpsServer, sessionMiddleware);
 
 // SERVER LISTENING
-http.listen(3000, () => console.log("Server Running at http://localhost:3000"));
+httpsServer.listen(parseInt(process.env.APP_PORT), "0.0.0.0", function () {
+  console.log("listening https://lcomni4.infomedia.co.id");
+});

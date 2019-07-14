@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+  <link rel="stylesheet" type="text/css" media="screen"
+    href="https://lcomni4.infomedia.co.id/assets/components/widget-font.css" />
+  <link rel="stylesheet" type="text/css" media="screen"
+    href="https://lcomni4.infomedia.co.id/assets/components/jquery.mCustomScrollbar.min.css" />
+  <link rel="stylesheet" type="text/css" media="screen"
+    href="https://lcomni4.infomedia.co.id/assets/components/widget.css" />
+  <link rel="stylesheet" type="text/css" media="screen"
+    href="https://lcomni4.infomedia.co.id/assets/components/fontawesome/css/font-awesome.css" />
+  <link rel="stylesheet" type="text/css" media="screen"
+    href="https://lcomni4.infomedia.co.id/assets/components/animate.css" />
+  <link rel="stylesheet" type="text/css" media="screen"
+    href="https://lcomni4.infomedia.co.id/assets/components/emojione.min.css" />
+  <link rel="stylesheet" type="text/css" media="screen"
+    href="https://lcomni4.infomedia.co.id/assets/components/octopush_chat.css" />
+</head>
+
+<body>
+  <div class="chat" id="chatbox" style="display: none">
+    <div class="chat-title">
+      <span id="chatheadertitreg">Chat With Us</span>
+      <span id="chatagentinfo" style="display:none;">
+        <h1>
+          <span id="name_agent">Waiting for Agent </span><span style="display: inline;" id="typing"></span>
+        </h1>
+
+        <figure class="avatar">
+          <img id="img_agent" src="https://lcomni4.infomedia.co.id/assets/images/profile-80.jpg" />
+        </figure>
+      </span>
+      <span class="chat-window">
+        <span id="hideChat"><a class="chatbar_link" href="#"><i class="fa fa-chevron-down"></i></a></span>
+        <span id="endChat" style="display: none"><a class="chatbar_link" href="#"><i class="fa fa-close"></i></a></span>
+      </span>
+    </div>
+
+    <div class="chat-register" id="inputan" style="display: block;">
+      <br />
+      <div style="text-align: center;padding-bottom:30px; ">
+        <img src="https://lcomni4.infomedia.co.id/assets/images/cl_header.png" style="max-width:100px;" /><br />
+        <span style="font-size: 20px;">Live Chat</span>
+      </div>
+
+      <form id="register_chat">
+        <input class="chat-register-input" type="text" id="from_name" name="from_name" placeholder="Name"
+          style="width:100%" required /><br /><br />
+        <input class="chat-register-input" type="email" id="from" name="from" placeholder="Email" style="width:100%"
+          required /><br /><br />
+        <input class="chat-register-input" type="hidden" id="zoom" value="0" style="width:100%" /><br />
+        <button class="chat-register-button" type="submit" style="width:100%;margin-top: -15px;">
+          Submit
+        </button>
+      </form>
+    </div>
+    <div id="chatBoxMessage" class="chat-interaction" style="display: none;"></div>
+    <div id="infchat" class="messages tabcontent">
+      <div id="message_content" class="messages-content"></div>
+    </div>
+    <div id="infvcall" class="chat-vicall tabcontent">
+      <img src="https://lcomni4.infomedia.co.id/assets/images/profile-80.jpg" />
+      <ul class="chat-btn-list" style="padding-left: 0px;">
+        <li>
+          <a href="#" onclick="startVideo();" class="chat-btn">START VIDEO CALL</a>
+        </li>
+      </ul>
+    </div>
+    <div id="infcall" class="chat-call tabcontent">
+      <div class="chat-call-duration">
+        <span>00</span> : <span>00</span> : <span>00</span>
+      </div>
+      <ul class="chat-btn-list" style="padding-left: 0px;">
+        <li><a href="#" class="chat-btn">CALL</a></li>
+      </ul>
+    </div>
+    <div id="chattype" class="message-box" style="display: none;">
+      <textarea id="input-text-chat" type="text" class="message-input" placeholder="Type message..."
+        disabled></textarea>
+      <style>
+        .image-upload>input {
+          display: none;
+        }
+      </style>
+      <table style="width:100%;margin-top:-25px">
+        <tr>
+          <td>
+            <!-- <div class="image-upload">
+              <label for="file-input">
+                <a class="chat-btns"><i class="fa fa-paperclip"></i></a>
+              </label>
+  
+              <input id="file-input" type="file" />
+            </div> -->
+          </td>
+
+          <td style="text-align:right;">
+            <button id="send" type="submit" class="chat-btns message-submit">
+              <i class="fa fa-send-o"></i>
+            </button>
+          </td>
+        </tr>
+      </table>
+    </div>
+    <div id="messagetoolbox" class="message-toolbox" style="display: none;text-align:right;">
+      <!-- <a href="https://infomedia.co.id/" target="_blank" style="font-size:12px !important; font-weight:600; color:#a3a3a3"
+        class="chatbar_link"><span style="font-weight:200">by</span> PT Infomedia Nusantara</a> -->
+      <a href="https://infomedia.co.id/" target="_blank"
+        style="font-size:12px !important; font-weight:600; color:#a3a3a3" class="chatbar_link"><span
+          style="font-weight:200"></span> @ 2019</a>
+    </div>
+
+    <div class="modal-things">
+      <input class="checker" type="checkbox" id="notifClose" hidden />
+      <div class="modal">
+        <div class="modal-body" style="text-align: center;">
+          <label class="modal__close" for="notifClose"></label>
+          <div class="modal-content">
+            <h2>Do you really want to leave current chat?</h2>
+            <br />
+            <label for="notifClose" onclick="end_message_client();" class="chat-keluar-button">Leave Chat</label>
+          </div>
+        </div>
+      </div>
+
+      <input class="checker" type="checkbox" id="chatSurvey" hidden />
+      <div class="modal">
+        <div class="modal-body">
+          <div class="modal-content">
+            <h2>Survey Kepuasan Pelanggan</h2>
+            <p class="chat-survey">
+              1. Apakah Anda puas dengan produk yang kami miliki?<br /><br />
+              <input type="radio" name="answer1" value="1" /> Puas<br />
+              <input type="radio" name="answer1" value="0" /> Tidak Puas<br /><br />
+              2. Apakah Anda puas dengan pelayanan Agent kami?<br /><br />
+              <input type="radio" name="answer2" value="1" /> Puas<br />
+              <input type="radio" name="answer2" value="0" /> Tidak Puas<br /><br /><br />
+              <label for="chatSurvey" onclick="submitSurvey();" class="chat-keluar-button">Submit</label>
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="bg"></div>
+
+  <div class="floated-chat-btn" onclick="btnFloat(1);">
+    <a><img src="https://lcomni4.infomedia.co.id/assets/images/chat2.png" width="32px;" /></a>
+  </div>
+
+  <script type="application/javascript" src="https://lcomni4.infomedia.co.id/assets/components/jquery.min.js"></script>
+  <script type="application/javascript"
+    src="https://lcomni4.infomedia.co.id/assets/components/jquery.mCustomScrollbar.concat.min.js"></script>
+  <script type="application/javascript" src="https://lcomni4.infomedia.co.id/assets/components/widget.js"></script>
+  <script type="application/javascript"
+    src="https://lcomni4.infomedia.co.id/assets/components/complete.ly.1.0.1.min.js"></script>
+  <script type="application/javascript"
+    src="https://lcomni4.infomedia.co.id/assets/components/jquery-2.1.3.min.js"></script>
+  <script type="application/javascript"
+    src="https://lcomni4.infomedia.co.id/assets/components/emojione.min.js"></script>
+  <script type="application/javascript"
+    src="https://lcomni4.infomedia.co.id/assets/components/bootstrap.min.js"></script>
+  <script type="application/javascript"
+    src="https://lcomni4.infomedia.co.id/assets/components/jquery-ui.min.js"></script>
+  <script type="application/javascript"
+    src="https://lcomni4.infomedia.co.id/assets/components/jquery.easing.min.js"></script>
+  <script type="application/javascript"
+    src="https://lcomni4.infomedia.co.id/assets/components/jquery.linkify.min.js"></script>
+  <script type="application/javascript" src="https://lcomni4.infomedia.co.id/assets/components/ripples.min.js"></script>
+  <script type="application/javascript"
+    src="https://lcomni4.infomedia.co.id/assets/components/material.min.js"></script>
+  <script type="application/javascript"
+    src="https://lcomni4.infomedia.co.id/assets/components/jquery.paste_image_reader.js"></script>
+  <script type="application/javascript" src="https://lcomni4.infomedia.co.id/socket.io/socket.io.js"></script>
+  <script type="application/javascript"
+    src="https://lcomni4.infomedia.co.id/assets/components/octopush_chat.js"></script>
+  <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+  <script type="application/javascript" src="https://lcomni4.infomedia.co.id/18201u310/oct_bri.js"></script>
+
+</body>
+
+</html>
